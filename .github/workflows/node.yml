@@ -6,12 +6,23 @@ on:
     branches: [main]
 jobs:
   build:
+    env:
+      CI: true
+      MONGO_URL: mongodb://localhost/nasa
+    strategy:
+      matrix:
+        node-version: [17.x, 21.x]
+        mongo-version: [5]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Use Node.js version 21
+      - name: Use Node.js version ${{matrix.node-version}}
         uses: actions/setup-node@v3
         with:
-          node-version: '21'
+          node-version: ${{matrix.node-version}}
+      - name: Use MongoDB from GitHub Actions
+        uses: supercharge/mongodb-github-action@1.10.0
+        with:
+          my-mongo-version-key: ${{matrix.mongo-version}}
       - run: npm install
       - run: npm run build --prefix client
